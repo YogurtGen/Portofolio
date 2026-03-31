@@ -1,0 +1,1761 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fensu Production — Video Editor Portfolio</title>
+
+  <!-- ============================================================
+       FONTS — change the Google Fonts URL below to swap fonts
+       Current: "Press Start 2P" (pixel heading) + "Oxanium" (body)
+  ============================================================ -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Oxanium:wght@300;400;600;700;800&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ============================================================
+       CSS VARIABLES — Edit these to change the color theme
+    ============================================================ */
+    :root {
+      --bg-dark:       #07080f;
+      --bg-card:       #0d0e1c;
+      --bg-card2:      #10111f;
+      --neon-cyan:     #00f5ff;
+      --neon-purple:   #bf5fff;
+      --neon-yellow:   #f5e642;
+      --neon-pink:     #ff3d8b;
+      --text-main:     #e8eaf6;
+      --text-muted:    #7b82a8;
+      --border:        rgba(0,245,255,0.18);
+      --glow-cyan:     0 0 18px rgba(0,245,255,0.55);
+      --glow-purple:   0 0 18px rgba(191,95,255,0.55);
+      --font-pixel:    'Press Start 2P', monospace;
+      --font-body:     'Oxanium', sans-serif;
+      --radius:        10px;
+    }
+
+    /* ============================================================
+       BASE RESET
+    ============================================================ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg-dark);
+      color: var(--text-main);
+      font-family: var(--font-body);
+      font-size: 16px;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* scanline overlay — remove this block to turn off the CRT effect */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(
+        to bottom,
+        transparent 0px,
+        transparent 2px,
+        rgba(0,0,0,0.06) 2px,
+        rgba(0,0,0,0.06) 4px
+      );
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    /* ============================================================
+       NOISE + GRID BACKGROUND
+    ============================================================ */
+    .bg-grid {
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0,245,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,245,255,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ============================================================
+       LAYOUT CONTAINER
+    ============================================================ */
+    .container {
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: 0 20px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ============================================================
+       NAVIGATION
+    ============================================================ */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 1000;
+      background: rgba(7,8,15,0.85);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 24px;
+      max-width: 1140px;
+      margin: 0 auto;
+    }
+    .nav-logo {
+      font-family: var(--font-pixel);
+      font-size: 0.7rem;
+      color: var(--neon-cyan);
+      text-shadow: var(--glow-cyan);
+      letter-spacing: 2px;
+      text-decoration: none;
+    }
+    .nav-links {
+      display: flex;
+      gap: 28px;
+      list-style: none;
+    }
+    .nav-links a {
+      font-family: var(--font-body);
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-decoration: none;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      transition: color 0.2s, text-shadow 0.2s;
+    }
+    .nav-links a:hover {
+      color: var(--neon-cyan);
+      text-shadow: var(--glow-cyan);
+    }
+
+    /* hamburger for mobile */
+    .nav-toggle {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 4px;
+    }
+    .nav-toggle span {
+      display: block;
+      width: 24px;
+      height: 2px;
+      background: var(--neon-cyan);
+      border-radius: 2px;
+      transition: all 0.3s;
+    }
+
+    @media (max-width: 680px) {
+      .nav-toggle { display: flex; }
+      .nav-links {
+        display: none;
+        position: absolute;
+        top: 100%; left: 0; right: 0;
+        flex-direction: column;
+        gap: 0;
+        background: rgba(7,8,15,0.97);
+        border-top: 1px solid var(--border);
+        padding: 12px 0;
+      }
+      .nav-links.open { display: flex; }
+      .nav-links a {
+        padding: 12px 24px;
+        display: block;
+      }
+    }
+
+    /* ============================================================
+       HERO SECTION
+    ============================================================ */
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 120px 20px 80px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* animated glow orbs */
+    .hero-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      animation: orbFloat 8s ease-in-out infinite alternate;
+    }
+    .hero-orb-1 {
+      width: 420px; height: 420px;
+      background: radial-gradient(circle, rgba(0,245,255,0.18), transparent 70%);
+      top: -80px; left: -100px;
+    }
+    .hero-orb-2 {
+      width: 360px; height: 360px;
+      background: radial-gradient(circle, rgba(191,95,255,0.18), transparent 70%);
+      bottom: -60px; right: -80px;
+      animation-delay: -4s;
+    }
+    @keyframes orbFloat {
+      from { transform: translate(0,0) scale(1); }
+      to   { transform: translate(30px,20px) scale(1.08); }
+    }
+
+    .hero-tag {
+      display: inline-block;
+      font-family: var(--font-pixel);
+      font-size: 0.5rem;
+      color: var(--neon-yellow);
+      border: 1px solid var(--neon-yellow);
+      padding: 6px 14px;
+      border-radius: 4px;
+      letter-spacing: 3px;
+      margin-bottom: 28px;
+      text-shadow: 0 0 10px var(--neon-yellow);
+      animation: blink 2.4s step-end infinite;
+    }
+    @keyframes blink {
+      0%,100% { opacity: 1; } 50% { opacity: 0.4; }
+    }
+
+    .hero-title {
+      font-family: var(--font-pixel);
+      font-size: clamp(1rem, 3.5vw, 2rem);
+      line-height: 1.7;
+      color: #fff;
+      text-shadow: 0 0 30px rgba(0,245,255,0.4);
+      margin-bottom: 10px;
+    }
+    .hero-title .accent-cyan  { color: var(--neon-cyan);   text-shadow: var(--glow-cyan); }
+    .hero-title .accent-purple { color: var(--neon-purple); text-shadow: var(--glow-purple); }
+
+    .hero-sub {
+      font-size: 1.05rem;
+      color: var(--text-muted);
+      font-weight: 400;
+      max-width: 520px;
+      margin: 18px auto 36px;
+      line-height: 1.8;
+    }
+
+    .hero-btns {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .btn {
+      display: inline-block;
+      font-family: var(--font-body);
+      font-weight: 700;
+      font-size: 0.85rem;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 13px 28px;
+      border-radius: var(--radius);
+      text-decoration: none;
+      transition: all 0.25s;
+      cursor: pointer;
+      border: none;
+    }
+    .btn-primary {
+      background: var(--neon-cyan);
+      color: var(--bg-dark);
+      box-shadow: var(--glow-cyan);
+    }
+    .btn-primary:hover {
+      background: #fff;
+      box-shadow: 0 0 28px rgba(0,245,255,0.9);
+      transform: translateY(-2px);
+    }
+    .btn-outline {
+      background: transparent;
+      color: var(--neon-purple);
+      border: 2px solid var(--neon-purple);
+      box-shadow: var(--glow-purple);
+    }
+    .btn-outline:hover {
+      background: rgba(191,95,255,0.12);
+      transform: translateY(-2px);
+    }
+
+    /* scroll indicator */
+    .scroll-cue {
+      position: absolute;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      opacity: 0.5;
+      animation: bounce 1.8s ease-in-out infinite;
+    }
+    .scroll-cue span { font-family: var(--font-pixel); font-size: 0.4rem; color: var(--text-muted); letter-spacing: 2px; }
+    .scroll-arrow { width: 18px; height: 18px; border-right: 2px solid var(--neon-cyan); border-bottom: 2px solid var(--neon-cyan); transform: rotate(45deg); }
+    @keyframes bounce { 0%,100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(8px); } }
+
+    /* ============================================================
+       SECTION SHARED STYLES
+    ============================================================ */
+    .section {
+      padding: 90px 0 70px;
+      position: relative;
+      z-index: 1;
+    }
+    .section-header {
+      text-align: center;
+      margin-bottom: 52px;
+    }
+    .section-label {
+      font-family: var(--font-pixel);
+      font-size: 0.45rem;
+      letter-spacing: 4px;
+      color: var(--neon-yellow);
+      text-transform: uppercase;
+      margin-bottom: 14px;
+      opacity: 0.85;
+    }
+    .section-title {
+      font-family: var(--font-pixel);
+      font-size: clamp(0.8rem, 2.5vw, 1.2rem);
+      line-height: 1.7;
+      color: #fff;
+    }
+    .section-title .cyan   { color: var(--neon-cyan);   text-shadow: var(--glow-cyan); }
+    .section-title .purple { color: var(--neon-purple);  text-shadow: var(--glow-purple); }
+    .section-desc {
+      margin-top: 14px;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.8;
+    }
+
+    /* divider line */
+    .divider {
+      width: 80px; height: 3px;
+      background: linear-gradient(90deg, var(--neon-cyan), var(--neon-purple));
+      border-radius: 2px;
+      margin: 20px auto 0;
+      box-shadow: 0 0 14px rgba(0,245,255,0.5);
+    }
+
+    /* ============================================================
+       SERVICES CARDS
+    ============================================================ */
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 24px;
+    }
+    .service-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 32px 24px;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
+    }
+    .service-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(0,245,255,0.05), transparent 60%);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .service-card:hover::before { opacity: 1; }
+    .service-card:hover {
+      transform: translateY(-5px);
+      border-color: var(--neon-cyan);
+      box-shadow: var(--glow-cyan);
+    }
+    .service-icon {
+      font-size: 2.2rem;
+      margin-bottom: 16px;
+      display: block;
+    }
+    .service-card h3 {
+      font-family: var(--font-pixel);
+      font-size: 0.6rem;
+      color: var(--neon-cyan);
+      margin-bottom: 10px;
+      line-height: 1.6;
+    }
+    .service-card p {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      line-height: 1.8;
+    }
+
+    /* ============================================================
+       CAROUSEL SHARED STYLES
+       Used by both Gaming and Poster sections
+    ============================================================ */
+    .carousel-wrap {
+      position: relative;
+    }
+    .carousel-track {
+      position: relative;
+      overflow: hidden;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+    }
+
+    /* each slide */
+    .slide {
+      display: none;
+      flex-direction: column;
+      gap: 20px;
+      padding: 28px;
+      animation: fadeIn 0.5s ease;
+    }
+    .slide.active { display: flex; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+    .slide-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .slide-title {
+      font-family: var(--font-pixel);
+      font-size: 0.65rem;
+      color: var(--neon-cyan);
+      line-height: 1.6;
+    }
+    .slide-desc {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      line-height: 1.7;
+    }
+    .slide-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 4px;
+    }
+    .tag {
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 20px;
+      border: 1px solid;
+      letter-spacing: 0.5px;
+    }
+    .tag-cyan   { color: var(--neon-cyan);   border-color: var(--neon-cyan);   background: rgba(0,245,255,0.08); }
+    .tag-purple { color: var(--neon-purple); border-color: var(--neon-purple); background: rgba(191,95,255,0.08); }
+    .tag-yellow { color: var(--neon-yellow); border-color: var(--neon-yellow); background: rgba(245,230,66,0.08); }
+    .tag-pink   { color: var(--neon-pink);   border-color: var(--neon-pink);   background: rgba(255,61,139,0.08); }
+
+    /* embed containers */
+    .embed-yt {
+      position: relative;
+      width: 100%;
+      padding-top: 56.25%;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #000;
+      border: 1px solid rgba(0,245,255,0.1);
+    }
+    .embed-yt iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%; height: 100%;
+      border: none;
+    }
+
+    .embed-drive {
+      position: relative;
+      width: 100%;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #111;
+      border: 1px solid rgba(191,95,255,0.2);
+      /* height is set inline per slide */
+    }
+    .embed-drive iframe {
+      width: 100%; height: 100%;
+      border: none;
+    }
+
+    /* carousel navigation */
+    .carousel-nav {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+    .nav-btn {
+      font-family: var(--font-pixel);
+      font-size: 0.5rem;
+      padding: 10px 18px;
+      background: transparent;
+      border: 1px solid var(--neon-cyan);
+      color: var(--neon-cyan);
+      border-radius: 6px;
+      cursor: pointer;
+      letter-spacing: 1px;
+      transition: all 0.2s;
+    }
+    .nav-btn:hover {
+      background: rgba(0,245,255,0.12);
+      box-shadow: var(--glow-cyan);
+    }
+    .dots {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.25s;
+      border: none;
+    }
+    .dot.active {
+      background: var(--neon-cyan);
+      box-shadow: var(--glow-cyan);
+      width: 22px;
+      border-radius: 4px;
+    }
+
+    /* progress bar */
+    .carousel-progress {
+      height: 2px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 2px;
+      margin-top: 12px;
+      overflow: hidden;
+    }
+    .carousel-progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--neon-cyan), var(--neon-purple));
+      border-radius: 2px;
+      width: 0%;
+      transition: width linear;
+    }
+
+    /* ============================================================
+       LANGUAGE + CURRENCY TOGGLE (nav area)
+    ============================================================ */
+    .nav-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .toggle-pill {
+      display: flex;
+      align-items: center;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      border-radius: 30px;
+      padding: 3px;
+      gap: 2px;
+    }
+    .toggle-pill button {
+      font-family: var(--font-pixel);
+      font-size: 0.38rem;
+      padding: 5px 10px;
+      border-radius: 20px;
+      border: none;
+      cursor: pointer;
+      background: transparent;
+      color: var(--text-muted);
+      letter-spacing: 1px;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .toggle-pill button.active {
+      background: var(--neon-cyan);
+      color: var(--bg-dark);
+      box-shadow: 0 0 10px rgba(0,245,255,0.4);
+    }
+    @media (max-width: 680px) {
+      .nav-controls { gap: 6px; }
+      .toggle-pill button { font-size: 0.32rem; padding: 4px 7px; }
+    }
+
+    /* ============================================================
+       PRICING SECTION
+    ============================================================ */
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+      gap: 24px;
+      align-items: stretch;
+    }
+    .pricing-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 32px 26px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+    }
+    .pricing-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+    }
+    .pricing-card:hover { transform: translateY(-6px); }
+
+    /* tier colors */
+    .pricing-card.basic  { border-color: rgba(0,245,255,0.25); }
+    .pricing-card.basic::before  { background: linear-gradient(135deg, rgba(0,245,255,0.06), transparent 60%); }
+    .pricing-card.basic:hover  { box-shadow: 0 0 28px rgba(0,245,255,0.2); border-color: var(--neon-cyan); }
+    .pricing-card.basic:hover::before { opacity: 1; }
+
+    .pricing-card.standard { border-color: rgba(245,230,66,0.3); }
+    .pricing-card.standard::before { background: linear-gradient(135deg, rgba(245,230,66,0.07), transparent 60%); }
+    .pricing-card.standard:hover { box-shadow: 0 0 28px rgba(245,230,66,0.25); border-color: var(--neon-yellow); }
+    .pricing-card.standard:hover::before { opacity: 1; }
+
+    .pricing-card.premium { border-color: rgba(191,95,255,0.3); }
+    .pricing-card.premium::before { background: linear-gradient(135deg, rgba(191,95,255,0.08), transparent 60%); }
+    .pricing-card.premium:hover { box-shadow: 0 0 28px rgba(191,95,255,0.25); border-color: var(--neon-purple); }
+    .pricing-card.premium:hover::before { opacity: 1; }
+
+    /* recommended badge */
+    .pricing-badge {
+      position: absolute;
+      top: 16px; right: 16px;
+      font-family: var(--font-pixel);
+      font-size: 0.38rem;
+      padding: 4px 10px;
+      border-radius: 20px;
+      background: var(--neon-yellow);
+      color: var(--bg-dark);
+      letter-spacing: 1px;
+      animation: blink 2.4s step-end infinite;
+    }
+    .pricing-tier-icon { font-size: 1.8rem; }
+    .pricing-tier-name {
+      font-family: var(--font-pixel);
+      font-size: 0.58rem;
+      line-height: 1.7;
+      letter-spacing: 1px;
+    }
+    .pricing-card.basic   .pricing-tier-name { color: var(--neon-cyan); }
+    .pricing-card.standard .pricing-tier-name { color: var(--neon-yellow); }
+    .pricing-card.premium  .pricing-tier-name { color: var(--neon-purple); }
+
+    .pricing-price {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .price-usd {
+      font-family: var(--font-pixel);
+      font-size: clamp(0.9rem, 2.5vw, 1.3rem);
+      color: #fff;
+      line-height: 1.4;
+    }
+    .price-idr {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      transition: opacity 0.3s;
+    }
+    .price-note {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* hide/show currency */
+    body.show-idr .price-idr { color: var(--neon-yellow); font-weight: 700; }
+
+    .pricing-divider {
+      width: 100%; height: 1px;
+      background: var(--border);
+    }
+    .pricing-includes {
+      font-family: var(--font-pixel);
+      font-size: 0.4rem;
+      letter-spacing: 2px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+    .pricing-features {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+      flex: 1;
+    }
+    .pricing-features li {
+      font-size: 0.84rem;
+      color: var(--text-main);
+      line-height: 1.5;
+      padding-left: 18px;
+      position: relative;
+    }
+    .pricing-features li::before {
+      content: '▸';
+      position: absolute;
+      left: 0;
+      font-size: 0.7rem;
+    }
+    .pricing-card.basic   .pricing-features li::before { color: var(--neon-cyan); }
+    .pricing-card.standard .pricing-features li::before { color: var(--neon-yellow); }
+    .pricing-card.premium  .pricing-features li::before { color: #ff2244; }
+
+    /* ── PREMIUM RUBY OVERRIDES ─────────────────────────────────── */
+    .pricing-card.premium {
+      background: linear-gradient(160deg, #130a0e 0%, #0d0e1c 60%);
+      border-color: rgba(200, 20, 50, 0.5);
+      box-shadow: 0 0 0 1px rgba(200,20,50,0.15), inset 0 0 40px rgba(180,10,30,0.08);
+    }
+    .pricing-card.premium::before {
+      background: linear-gradient(135deg, rgba(200,20,50,0.12), rgba(255,80,80,0.04) 50%, transparent 70%);
+    }
+    .pricing-card.premium:hover {
+      border-color: #e01535;
+      box-shadow:
+        0 0 0 1px rgba(220,20,50,0.4),
+        0 0 40px rgba(200,10,30,0.35),
+        0 0 80px rgba(180,0,20,0.15),
+        inset 0 0 50px rgba(180,10,30,0.12);
+    }
+    .pricing-card.premium:hover::before { opacity: 1; }
+
+    .pricing-card.premium .pricing-tier-name { color: #ff2244; text-shadow: 0 0 16px rgba(255,34,68,0.7); }
+    .pricing-card.premium .price-usd         { color: #fff; text-shadow: 0 0 20px rgba(255,34,68,0.5); }
+    .pricing-card.premium .pricing-divider   { background: linear-gradient(90deg, transparent, rgba(220,20,50,0.5), transparent); }
+
+    /* ruby gem badge — inherits .pricing-badge shape, overrides color */
+    .premium-badge {
+      position: absolute !important;
+      top: 16px !important; right: 16px !important;
+      background: #cc0022 !important;
+      color: #fff !important;
+      width: auto !important;
+    }
+
+    /* canvas spark overlay */
+    .premium-spark-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      border-radius: 14px;
+      z-index: 0;
+    }
+    /* push card content above canvas */
+    .pricing-card.premium > *:not(.premium-spark-canvas) { position: relative; z-index: 1; }
+
+    /* ruby button */
+    .btn-premium {
+      background: linear-gradient(135deg, rgba(180,0,30,0.15), rgba(100,0,20,0.1));
+      color: #ff4466;
+      border: 1.5px solid #cc1133;
+      box-shadow: 0 0 12px rgba(200,0,30,0.3);
+    }
+    .btn-premium:hover {
+      background: linear-gradient(135deg, rgba(200,0,30,0.3), rgba(120,0,20,0.2));
+      box-shadow: 0 0 24px rgba(220,0,40,0.6);
+      color: #fff;
+      border-color: #ff2244;
+      transform: translateY(-2px);
+    }
+
+    .pricing-cta {
+      margin-top: auto;
+    }
+    .pricing-cta .btn { width: 100%; text-align: center; font-size: 0.78rem; }
+    .btn-basic    { background: transparent; color: var(--neon-cyan);   border: 1.5px solid var(--neon-cyan);   }
+    .btn-basic:hover    { background: rgba(0,245,255,0.1); box-shadow: var(--glow-cyan); }
+    .btn-standard { background: var(--neon-yellow); color: var(--bg-dark); box-shadow: 0 0 14px rgba(245,230,66,0.4); }
+    .btn-standard:hover { background: #fff; box-shadow: 0 0 24px rgba(245,230,66,0.6); transform: translateY(-2px); }
+    .btn-premium  { background: transparent; color: var(--neon-purple); border: 1.5px solid var(--neon-purple); }
+    .btn-premium:hover  { background: rgba(191,95,255,0.1); box-shadow: var(--glow-purple); }
+
+    /* ============================================================
+       CONTACT SECTION
+    ============================================================ */
+    #contact {
+      background: linear-gradient(180deg, transparent, rgba(0,245,255,0.03));
+    }
+    .contact-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 48px 40px;
+      text-align: center;
+      max-width: 600px;
+      margin: 0 auto;
+      position: relative;
+      overflow: hidden;
+    }
+    .contact-box::before {
+      content: '';
+      position: absolute;
+      top: -60px; left: 50%;
+      transform: translateX(-50%);
+      width: 300px; height: 300px;
+      background: radial-gradient(circle, rgba(0,245,255,0.1), transparent 70%);
+      pointer-events: none;
+    }
+    .contact-box h2 {
+      font-family: var(--font-pixel);
+      font-size: clamp(0.65rem, 2vw, 0.9rem);
+      color: #fff;
+      line-height: 1.7;
+      margin-bottom: 14px;
+    }
+    .contact-box p {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      line-height: 1.8;
+      margin-bottom: 30px;
+    }
+    .contact-links {
+      display: flex;
+      gap: 14px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    /* ============================================================
+       FOOTER
+    ============================================================ */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 28px 20px;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+    footer p {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      font-family: var(--font-pixel);
+      letter-spacing: 1px;
+      line-height: 2;
+    }
+    footer span { color: var(--neon-cyan); }
+
+    /* ============================================================
+       UTILITY — section separator glow line
+    ============================================================ */
+    .glow-line {
+      width: 100%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--neon-cyan), var(--neon-purple), transparent);
+      opacity: 0.25;
+      margin: 0;
+    }
+
+    /* ============================================================
+       RESPONSIVE TWEAKS
+    ============================================================ */
+    @media (max-width: 600px) {
+      .slide { padding: 18px; gap: 16px; }
+      .contact-box { padding: 32px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ====================== BACKGROUND GRID ====================== -->
+<div class="bg-grid"></div>
+
+<!-- ======================== NAVIGATION ========================= -->
+<nav>
+  <div class="nav-inner">
+    <!-- ▼ EDIT: Change the logo text below -->
+    <a class="nav-logo" href="#hero">FENSU PRODUCTION</a>
+
+    <button class="nav-toggle" id="navToggle" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+
+    <ul class="nav-links" id="navLinks">
+      <!-- ▼ EDIT: Add/remove <li> to add nav links. href="#sectionID" -->
+      <li><a href="#services" data-en="Services" data-id="Layanan">Services</a></li>
+      <li><a href="#gaming" data-en="Gaming" data-id="Gaming">Gaming</a></li>
+      <li><a href="#posters" data-en="Thumbnails" data-id="Thumbnail">Thumbnails</a></li>
+      <li><a href="#pricing" data-en="Pricing" data-id="Harga">Pricing</a></li>
+      <li><a href="#contact" data-en="Contact" data-id="Kontak">Contact</a></li>
+    </ul>
+
+    <!-- Language toggle (EN = USD prices, ID = IDR prices) -->
+    <div class="nav-controls">
+      <div class="toggle-pill" id="langToggle">
+        <button class="active" data-lang="en">EN</button>
+        <button data-lang="id">ID</button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ========================== HERO ============================= -->
+<section id="hero">
+  <div class="hero-orb hero-orb-1"></div>
+  <div class="hero-orb hero-orb-2"></div>
+
+  <!-- ▼ EDIT: Change the blinking tag text -->
+  <div class="hero-tag" data-en="PRESS START" data-id="MULAI SEKARANG">PRESS START</div>
+
+  <!-- ▼ EDIT: Main title -->
+  <h1 class="hero-title">
+    <span data-en="VIDEO EDITOR" data-id="VIDEO EDITOR">VIDEO EDITOR</span><br>
+    <span class="accent-cyan" data-en="LEVEL UP" data-id="TINGKATKAN">LEVEL UP</span> <span data-en="YOUR" data-id="">YOUR</span><br>
+    <span class="accent-purple" data-en="CONTENT" data-id="KONTENMU">CONTENT</span>
+  </h1>
+
+  <!-- ▼ EDIT: Short description / pitch -->
+  <p class="hero-sub" data-en="Long-form video editing, gaming highlights &amp; cinematic cuts. I turn raw footage into content that slaps." data-id="Edit video long-form, highlight gaming, dan sinematik. Aku ubah footage mentah jadi konten yang keren abis.">
+    Long-form video editing, gaming highlights &amp; cinematic cuts.
+    I turn raw footage into content that slaps.
+  </p>
+
+  <div class="hero-btns">
+    <a class="btn btn-primary" href="#gaming" data-en="View My Work" data-id="Lihat Karya">View My Work</a>
+    <a class="btn btn-outline" href="#contact" data-en="Hire Me" data-id="Rekrut Aku">Hire Me</a>
+  </div>
+
+  <div class="scroll-cue">
+    <span data-en="SCROLL" data-id="SCROLL">SCROLL</span>
+    <div class="scroll-arrow"></div>
+  </div>
+</section>
+
+<div class="glow-line"></div>
+
+<!-- ======================== SERVICES =========================== -->
+<section id="services" class="section">
+  <div class="container">
+    <div class="section-header">
+      <p class="section-label">// WHAT I DO</p>
+      <h2 class="section-title">SERVICES<br><span class="cyan">UNLOCKED</span></h2>
+      <div class="divider"></div>
+    </div>
+
+    <div class="services-grid">
+
+      <!-- ▼ EDIT: Each <div class="service-card"> is one service card -->
+      <!-- To ADD a card: copy one block and paste after the last </div> -->
+      <!-- To REMOVE a card: delete the entire <div class="service-card">…</div> block -->
+
+      <div class="service-card">
+        <span class="service-icon">🎮</span>
+        <h3>GAMING VIDEO EDIT</h3>
+        <!-- ▼ EDIT: Service description -->
+        <p>Epic highlights, commentary edits, and cinematic gaming montages. From raw gameplay to binge-worthy content.</p>
+      </div>
+
+      <div class="service-card">
+        <span class="service-icon">🎙️</span>
+        <h3>LONG-FORM CONTENT</h3>
+        <p>Podcast video editing, vlogs, documentary-style content. Structured storytelling with clean pacing and flow.</p>
+      </div>
+
+      <div class="service-card">
+        <span class="service-icon">🖼️</span>
+        <h3>THUMBNAIL DESIGN</h3>
+        <p>Click-bait thumbnails that actually deliver — bold compositions, custom typography, and color grading that pops on any feed.</p>
+      </div>
+
+      <!-- ▼ EXAMPLE extra card — uncomment to show it:
+      <div class="service-card">
+        <span class="service-icon">✏️</span>
+        <h3>YOUR SERVICE HERE</h3>
+        <p>Description goes here.</p>
+      </div>
+      -->
+
+    </div>
+  </div>
+</section>
+
+<div class="glow-line"></div>
+
+<!-- ===================== GAMING VIDEO CAROUSEL ================= -->
+<!--
+  HOW TO ADD A NEW GAMING VIDEO:
+  1. Copy one entire <div class="slide"> block below
+  2. Paste it BEFORE the closing </div> of #gaming-slides
+  3. Replace the YouTube video ID in the iframe src
+     — Find your video ID from YouTube URL: youtube.com/watch?v=VIDEO_ID_HERE
+     — Replace VIDEO_ID_HERE in: https://www.youtube.com/embed/VIDEO_ID_HERE?...
+  4. Update title, description, and tags
+  5. The dot navigation and auto-slide will update automatically
+-->
+<section id="gaming" class="section">
+  <div class="container">
+    <div class="section-header">
+      <p class="section-label">// PORTFOLIO</p>
+      <h2 class="section-title"><span class="cyan">GAMING</span><br>VIDEO EDITS</h2>
+      <div class="divider"></div>
+      <p class="section-desc">Long-form gaming content, highlights, and cinematic edits.</p>
+    </div>
+
+    <div class="carousel-wrap">
+      <div class="carousel-track" id="gaming-slides">
+
+        <!-- ═══════════════════════════════════════════════════
+             GAMING SLIDE 1
+
+             HOW TO EMBED FROM YOUTUBE:
+             1. Ganti VIDEO_ID_HERE dengan ID video YouTube kamu
+                ID ada di URL: youtube.com/watch?v=VIDEO_ID_HERE
+             2. Simpan — thumbnail otomatis tampil dari YouTube
+             3. Klik thumbnail di web = player langsung load (no error!)
+
+             CATATAN: Pastikan video kamu mengizinkan embedding
+             (Settings → Advanced → Allow embedding ✅)
+        ════════════════════════════════════════════════════ -->
+        <div class="slide active">
+          <div class="embed-yt">
+            <!-- ▼ EDIT: Ganti src= di bawah dengan src dari embed YouTube kamu -->
+            <!-- Cara: YouTube → Share → Embed → copy bagian src="..." nya saja -->
+            <iframe
+              src="https://www.youtube.com/embed/0Op_PNSJp5U?si=hkAO37KHiOmetjvj&amp;controls=1"
+              title="Gaming Edit 1"
+              frameborder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              referrerpolicy="strict-origin-when-cross-origin"
+              allowfullscreen>
+            </iframe>
+          </div>
+          <div class="slide-meta">
+            <!-- ▼ EDIT: Title of the video project -->
+            <div class="slide-title">PROJECT TITLE HERE</div>
+            <!-- ▼ EDIT: Short description -->
+            <div class="slide-desc">Describe what you did in this edit — game name, style, duration, platform.</div>
+            <!-- ▼ EDIT: Tags — change class for color: tag-cyan | tag-purple | tag-yellow | tag-pink -->
+            <div class="slide-tags">
+              <span class="tag tag-cyan">GAME NAME</span>
+              <span class="tag tag-purple">LONG-FORM</span>
+              <span class="tag tag-yellow">YOUTUBE</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════
+             GAMING SLIDE 2 — ganti VIDEO_ID_HERE dengan ID video YouTube
+        ════════════════════════════════════════════════════ -->
+        <div class="slide">
+          <div class="embed-yt">
+            <!-- ▼ EDIT: Ganti src= dengan src dari embed YouTube kamu -->
+            <iframe
+              src="https://www.youtube.com/embed/VIDEO_ID_HERE?si=PASTE_SI_HERE"
+              title="Gaming Edit 2"
+              frameborder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              referrerpolicy="strict-origin-when-cross-origin"
+              allowfullscreen>
+            </iframe>
+          </div>
+          <div class="slide-meta">
+            <div class="slide-title">PROJECT TITLE HERE</div>
+            <div class="slide-desc">Describe what you did in this edit — game name, style, duration, platform.</div>
+            <div class="slide-tags">
+              <span class="tag tag-cyan">GAME NAME</span>
+              <span class="tag tag-pink">HIGHLIGHT</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════
+             GAMING SLIDE 3 — ganti VIDEO_ID_HERE dengan ID video YouTube
+        ════════════════════════════════════════════════════ -->
+        <div class="slide">
+          <div class="embed-yt">
+            <!-- ▼ EDIT: Ganti src= dengan src dari embed YouTube kamu -->
+            <iframe
+              src="https://www.youtube.com/embed/VIDEO_ID_HERE?si=PASTE_SI_HERE"
+              title="Gaming Edit 3"
+              frameborder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              referrerpolicy="strict-origin-when-cross-origin"
+              allowfullscreen>
+            </iframe>
+          </div>
+          <div class="slide-meta">
+            <div class="slide-title">PROJECT TITLE HERE</div>
+            <div class="slide-desc">Describe what you did in this edit — game name, style, duration, platform.</div>
+            <div class="slide-tags">
+              <span class="tag tag-purple">CINEMATIC</span>
+              <span class="tag tag-yellow">STREAMING</span>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- end #gaming-slides -->
+
+      <!-- Navigation -->
+      <div class="carousel-nav" id="gaming-nav">
+        <button class="nav-btn" id="gaming-prev">◄ PREV</button>
+        <div class="dots" id="gaming-dots"></div>
+        <button class="nav-btn" id="gaming-next">NEXT ►</button>
+      </div>
+      <div class="carousel-progress">
+        <div class="carousel-progress-bar" id="gaming-bar"></div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<div class="glow-line"></div>
+
+<!-- ====================== THUMBNAIL CAROUSEL ====================== -->
+<!--
+  HOW TO ADD A NEW THUMBNAIL:
+  1. Copy one entire <div class="slide"> block below
+  2. Paste it BEFORE the closing </div> of #poster-slides
+  3. Get your Google Drive FILE ID:
+     — Upload image to Drive → right-click → Share → "Anyone with the link"
+     — Copy the link, it looks like: drive.google.com/file/d/FILE_ID_HERE/view
+     — Grab the FILE_ID_HERE part (long alphanumeric string)
+     — Paste it into: https://drive.google.com/uc?export=view&id=FILE_ID_HERE
+
+  SUPPORTED FILE TYPES via Drive:
+     ✅ JPG / PNG / WEBP → use the <img> embed (already set below)
+     ✅ PDF              → use the <iframe> embed option B (see comment inside slide)
+     ✅ Google Slides    → use iframe with /preview suffix on sharing URL
+
+  TROUBLESHOOTING:
+     If image doesn't load, make sure sharing is set to "Anyone with the link"
+     and the file is not restricted to your organization only.
+-->
+<section id="posters" class="section">
+  <div class="container">
+    <div class="section-header">
+      <p class="section-label">// DESIGN WORK</p>
+      <h2 class="section-title"><span class="purple">THUMBNAIL</span><br>EDITOR</h2>
+      <div class="divider"></div>
+      <p class="section-desc">Click-worthy thumbnails designed to stop the scroll.</p>
+    </div>
+
+    <div class="carousel-wrap">
+      <div class="carousel-track" id="poster-slides">
+
+        <!-- ═══════════════════════════════════════════════════
+             THUMBNAIL SLIDE 1
+             Replace FILE_ID_HERE with your Google Drive image file ID.
+             How to get file ID: open file in Drive → look at URL →
+             drive.google.com/file/d/THIS_PART_HERE/view
+        ════════════════════════════════════════════════════ -->
+        <div class="slide active">
+          <!-- EMBED: Google Drive image (JPG/PNG/WEBP) -->
+          <div style="position:relative; width:100%; padding-top:56.25%; background:#0a0a14; border-radius:8px; overflow:hidden; border:1px solid rgba(191,95,255,0.2);">
+            <img
+              src="https://drive.google.com/uc?export=view&id=FILE_ID_HERE"
+              style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover;"
+              alt="Thumbnail 1"
+            />
+          </div>
+
+          <!-- EMBED option B: for PDF — uncomment this and remove the img block above if needed
+          <div class="embed-drive" style="height: 480px;">
+            <iframe
+              src="https://drive.google.com/file/d/FILE_ID_HERE/preview"
+              allow="autoplay"
+              title="Thumbnail 1">
+            </iframe>
+          </div>
+          -->
+
+          <div class="slide-meta">
+            <!-- ▼ EDIT: Thumbnail project title and description -->
+            <div class="slide-title">THUMBNAIL TITLE HERE</div>
+            <div class="slide-desc">Client / channel, niche, tools used (Photoshop, Canva, etc.), style notes.</div>
+            <div class="slide-tags">
+              <span class="tag tag-purple">THUMBNAIL</span>
+              <span class="tag tag-cyan">PHOTOSHOP</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════
+             THUMBNAIL SLIDE 2 — duplicate this block for more thumbnails
+        ════════════════════════════════════════════════════ -->
+        <div class="slide">
+          <div style="position:relative; width:100%; padding-top:56.25%; background:#0a0a14; border-radius:8px; overflow:hidden; border:1px solid rgba(191,95,255,0.2);">
+            <img
+              src="https://drive.google.com/uc?export=view&id=FILE_ID_HERE"
+              style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover;"
+              alt="Thumbnail 2"
+            />
+          </div>
+          <div class="slide-meta">
+            <div class="slide-title">THUMBNAIL TITLE HERE</div>
+            <div class="slide-desc">Client / channel, niche, tools used, style notes.</div>
+            <div class="slide-tags">
+              <span class="tag tag-pink">GAMING THUMBNAIL</span>
+              <span class="tag tag-yellow">ILLUSTRATOR</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════
+             THUMBNAIL SLIDE 3
+        ════════════════════════════════════════════════════ -->
+        <div class="slide">
+          <div style="position:relative; width:100%; padding-top:56.25%; background:#0a0a14; border-radius:8px; overflow:hidden; border:1px solid rgba(191,95,255,0.2);">
+            <img
+              src="https://drive.google.com/uc?export=view&id=FILE_ID_HERE"
+              style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover;"
+              alt="Thumbnail 3"
+            />
+          </div>
+          <div class="slide-meta">
+            <div class="slide-title">THUMBNAIL TITLE HERE</div>
+            <div class="slide-desc">Client / channel, niche, tools used, style notes.</div>
+            <div class="slide-tags">
+              <span class="tag tag-cyan">YOUTUBE</span>
+              <span class="tag tag-purple">CLICKBAIT DONE RIGHT</span>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- end #poster-slides -->
+
+      <div class="carousel-nav" id="poster-nav">
+        <button class="nav-btn" id="poster-prev">◄ PREV</button>
+        <div class="dots" id="poster-dots"></div>
+        <button class="nav-btn" id="poster-next">NEXT ►</button>
+      </div>
+      <div class="carousel-progress">
+        <div class="carousel-progress-bar" id="poster-bar"></div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<div class="glow-line"></div>
+
+<!-- ========================= PRICING ========================== -->
+<!--
+  HOW TO EDIT PRICES:
+  — USD price: edit the text inside <span class="price-usd">
+  — IDR price: edit the text inside <span class="price-idr">
+  — Features: add/remove <li> inside <ul class="pricing-features">
+  — To add a new package: copy an entire <div class="pricing-card"> block
+-->
+<section id="pricing" class="section">
+  <div class="container">
+    <div class="section-header">
+      <p class="section-label" data-en="// INVESTMENT" data-id="// INVESTASI">// INVESTMENT</p>
+      <h2 class="section-title"><span class="cyan" data-en="PRICE" data-id="HARGA">PRICE</span><br><span data-en="LIST" data-id="LIST">LIST</span></h2>
+      <div class="divider"></div>
+      <p class="section-desc" data-en="Gaming video editing packages — priced per minute of final output." data-id="Paket edit video gaming — harga per menit hasil akhir.">
+        Gaming video editing packages — priced per minute of final output.
+      </p>
+    </div>
+
+    <div class="pricing-grid">
+
+      <!-- ══ BASIC PACKAGE ══════════════════════════════════════ -->
+      <div class="pricing-card basic">
+        <div>
+          <div class="pricing-tier-icon">🟢</div>
+          <div class="pricing-tier-name" data-en="BASIC PACKAGE" data-id="PAKET BASIC">BASIC PACKAGE</div>
+          <div style="font-size:0.75rem; color:var(--text-muted); margin-top:4px;" data-en="Light Editing" data-id="Editing Ringan">Light Editing</div>
+        </div>
+
+        <div class="pricing-price">
+          <!-- ▼ EDIT USD price here -->
+          <div class="price-usd">$10<span style="font-size:0.5em;color:var(--text-muted)"> / min</span></div>
+          <!-- ▼ EDIT IDR price here -->
+          <div class="price-idr">Rp160.000 / menit</div>
+          <div class="price-note" data-en="Per minute of final video" data-id="Per menit video jadi">Per minute of final video</div>
+        </div>
+
+        <div class="pricing-divider"></div>
+
+        <div>
+          <div class="pricing-includes" data-en="INCLUDES:" data-id="TERMASUK:">INCLUDES:</div>
+          <!-- ▼ EDIT: add/remove features for Basic -->
+          <ul class="pricing-features">
+            <li data-en="Clean cut &amp; trim" data-id="Cut &amp; trim rapi">Clean cut &amp; trim</li>
+            <li data-en="Basic transitions" data-id="Transisi dasar">Basic transitions</li>
+            <li data-en="Light sound effects" data-id="Sound effect ringan">Light sound effects</li>
+            <li data-en="Simple zoom" data-id="Zoom sederhana">Simple zoom</li>
+          </ul>
+        </div>
+
+        <div class="pricing-cta">
+          <a class="btn btn-basic" href="#contact" data-en="GET STARTED" data-id="MULAI SEKARANG">GET STARTED</a>
+        </div>
+      </div>
+
+      <!-- ══ STANDARD PACKAGE ══════════════════════════════════ -->
+      <div class="pricing-card standard">
+        <div class="pricing-badge" data-en="🔥 RECOMMENDED" data-id="🔥 RECOMMENDED">🔥 RECOMMENDED</div>
+        <div>
+          <div class="pricing-tier-icon">🟡</div>
+          <div class="pricing-tier-name" data-en="STANDARD PACKAGE" data-id="PAKET STANDARD">STANDARD PACKAGE</div>
+          <div style="font-size:0.75rem; color:var(--text-muted); margin-top:4px;" data-en="Most Popular" data-id="Paling Populer">Most Popular</div>
+        </div>
+
+        <div class="pricing-price">
+          <!-- ▼ EDIT USD price here -->
+          <div class="price-usd">$20<span style="font-size:0.5em;color:var(--text-muted)"> / min</span></div>
+          <!-- ▼ EDIT IDR price here -->
+          <div class="price-idr">Rp320.000 / menit</div>
+          <div class="price-note" data-en="Per minute of final video" data-id="Per menit video jadi">Per minute of final video</div>
+        </div>
+
+        <div class="pricing-divider"></div>
+
+        <div>
+          <div class="pricing-includes" data-en="INCLUDES:" data-id="TERMASUK:">INCLUDES:</div>
+          <!-- ▼ EDIT: add/remove features for Standard -->
+          <ul class="pricing-features">
+            <li data-en="Everything in Basic" data-id="Semua di Basic">Everything in Basic</li>
+            <li data-en="Varied memes &amp; sound effects" data-id="Meme &amp; sound effect variatif">Varied memes &amp; sound effects</li>
+            <li data-en="Highlight subtitles" data-id="Subtitle highlight">Highlight subtitles</li>
+            <li data-en="Zoom in/out + punch edit" data-id="Zoom in/out + punch edit">Zoom in/out + punch edit</li>
+            <li data-en="Light beat sync" data-id="Beat sync ringan">Light beat sync</li>
+          </ul>
+        </div>
+
+        <div class="pricing-cta">
+          <a class="btn btn-standard" href="#contact" data-en="GET STARTED" data-id="MULAI SEKARANG">GET STARTED</a>
+        </div>
+      </div>
+
+      <!-- ══ PREMIUM PACKAGE ═══════════════════════════════════ -->
+      <div class="pricing-card premium" id="premiumCard">
+        <!-- Ruby spark particle canvas (animated via JS) -->
+        <canvas class="premium-spark-canvas" id="rubyCanvas"></canvas>
+
+        <!-- Ruby badge replaces old purple badge -->
+        <div class="pricing-badge premium-badge">💎 PREMIUM</div>
+        <div>
+          <div class="pricing-tier-icon">🔴</div>
+          <div class="pricing-tier-name" data-en="PREMIUM PACKAGE" data-id="PAKET PREMIUM">PREMIUM PACKAGE</div>
+          <div style="font-size:0.75rem; color:var(--text-muted); margin-top:4px;" data-en="High Effort" data-id="Effort Tinggi">High Effort</div>
+        </div>
+
+        <div class="pricing-price">
+          <!-- ▼ EDIT USD price here -->
+          <div class="price-usd">$30<span style="font-size:0.5em;color:var(--text-muted)"> / min</span></div>
+          <!-- ▼ EDIT IDR price here -->
+          <div class="price-idr">Rp480.000 / menit</div>
+          <div class="price-note" data-en="Per minute of final video" data-id="Per menit video jadi">Per minute of final video</div>
+        </div>
+
+        <div class="pricing-divider"></div>
+
+        <div>
+          <div class="pricing-includes" data-en="INCLUDES:" data-id="TERMASUK:">INCLUDES:</div>
+          <!-- ▼ EDIT: add/remove features for Premium -->
+          <ul class="pricing-features">
+            <li data-en="Thumbnail included" data-id="Thumbnail sudah termasuk">Thumbnail included</li>
+            <li data-en="Everything in Standard" data-id="Semua di Standard">Everything in Standard</li>
+            <li data-en="Full styled subtitles" data-id="Subtitle full styling">Full styled subtitles</li>
+            <li data-en="Advanced meme timing" data-id="Advanced meme timing">Advanced meme timing</li>
+            <li data-en="Intentional sound design" data-id="Sound design lebih niat">Intentional sound design</li>
+            <li data-en="Light motion graphics" data-id="Motion graphic ringan">Light motion graphics</li>
+            <li data-en="Storytelling flow" data-id="Storytelling flow">Storytelling flow</li>
+          </ul>
+        </div>
+
+        <div class="pricing-cta">
+          <a class="btn btn-premium" href="#contact" data-en="GET STARTED" data-id="MULAI SEKARANG">GET STARTED</a>
+        </div>
+      </div>
+
+    </div><!-- end pricing-grid -->
+  </div>
+</section>
+
+<div class="glow-line"></div>
+
+<!-- ========================= CONTACT ========================== -->
+<section id="contact" class="section">
+  <div class="container">
+    <div class="section-header">
+      <p class="section-label">// LET'S COLLAB</p>
+      <h2 class="section-title">READY TO<br><span class="cyan">LEVEL UP?</span></h2>
+      <div class="divider"></div>
+    </div>
+
+    <div class="contact-box">
+      <!-- ▼ EDIT: Contact section heading -->
+      <h2>HIRE ME FOR YOUR NEXT PROJECT</h2>
+      <!-- ▼ EDIT: Contact description -->
+      <p>
+        Open for freelance work — gaming edits, long-form content,
+        podcast editing, and poster design. Let's build something great.
+      </p>
+
+      <div class="contact-links">
+        <!-- ▼ EDIT: Replace href with your actual contact links -->
+        <a class="btn btn-primary" href="/cdn-cgi/l/email-protection#245d4b51564149454d48644349454d480a474b49">EMAIL ME</a>
+        <a class="btn btn-outline" href="https://instagram.com/yourhandle" target="_blank" rel="noopener">INSTAGRAM</a>
+        <!-- Add more contact buttons here, same format as above -->
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =========================== FOOTER ========================== -->
+<footer>
+  <div class="container">
+    <!-- ▼ EDIT: Footer text / copyright -->
+    <p>© <span id="year"></span> <span>FENSU PRODUCTION</span> — ALL RIGHTS RESERVED</p>
+    <p style="margin-top:6px; font-size:0.35rem;">CRAFTED WITH ♥ + CAFFEINE</p>
+  </div>
+</footer>
+
+<!-- ================================================================
+     JAVASCRIPT
+     ================================================================
+     CAROUSEL CONFIG — change SLIDE_INTERVAL_MS to adjust auto-slide speed.
+     Current: 5000ms = 5 seconds
+================================================================ -->
+<script>
+  /* ── auto-slide timer duration (milliseconds) ─────────────────────── */
+  const SLIDE_INTERVAL_MS = 5000; /* ← EDIT: change 5000 to any ms value */
+
+  /* ── mobile nav toggle ───────────────────────────────────────────── */
+  document.getElementById('navToggle').addEventListener('click', () => {
+    document.getElementById('navLinks').classList.toggle('open');
+  });
+  document.querySelectorAll('.nav-links a').forEach(a =>
+    a.addEventListener('click', () => document.getElementById('navLinks').classList.remove('open'))
+  );
+
+  /* ── footer year ─────────────────────────────────────────────────── */
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  /* ══════════════════════════════════════════════════════════════════
+     CAROUSEL ENGINE
+     Works for ANY carousel on the page.
+     Params:
+       slidesId   — id of the slides container
+       prevId     — id of "prev" button
+       nextId     — id of "next" button
+       dotsId     — id of the dots container
+       barId      — id of the progress bar element
+       isYoutube  — true if slides contain YouTube iframes (enables pause-on-play detection)
+  ══════════════════════════════════════════════════════════════════ */
+  function initCarousel({ slidesId, prevId, nextId, dotsId, barId, isYoutube = false }) {
+    const container = document.getElementById(slidesId);
+    const slides    = Array.from(container.querySelectorAll('.slide'));
+    const dotsEl    = document.getElementById(dotsId);
+    const bar       = document.getElementById(barId);
+    const prevBtn   = document.getElementById(prevId);
+    const nextBtn   = document.getElementById(nextId);
+
+    let current      = 0;
+    let timer        = null;
+    let barTimer     = null;
+    let isPausedByYT = false; /* true while user is watching a YouTube video */
+
+    /* build dots */
+    slides.forEach((_, i) => {
+      const d = document.createElement('button');
+      d.className = 'dot' + (i === 0 ? ' active' : '');
+      d.setAttribute('aria-label', 'Slide ' + (i + 1));
+      d.addEventListener('click', () => goTo(i));
+      dotsEl.appendChild(d);
+    });
+
+    function updateDots() {
+      dotsEl.querySelectorAll('.dot').forEach((d, i) =>
+        d.classList.toggle('active', i === current)
+      );
+    }
+
+    function goTo(idx) {
+      slides[current].classList.remove('active');
+      current = (idx + slides.length) % slides.length;
+      slides[current].classList.add('active');
+      updateDots();
+      resetBar();
+    }
+
+    /* ── progress bar animation ──────────────────────────────────── */
+    function resetBar() {
+      clearTimeout(barTimer);
+      bar.style.transition = 'none';
+      bar.style.width = '0%';
+      /* force reflow */
+      void bar.offsetWidth;
+      bar.style.transition = `width ${SLIDE_INTERVAL_MS}ms linear`;
+      bar.style.width = '100%';
+    }
+
+    /* ── auto-slide ──────────────────────────────────────────────── */
+    function startAuto() {
+      clearInterval(timer);
+      timer = setInterval(() => {
+        if (!isPausedByYT) goTo(current + 1);
+      }, SLIDE_INTERVAL_MS);
+      resetBar();
+    }
+
+    function stopAuto()  { clearInterval(timer); bar.style.transition = 'none'; }
+    function pauseBar()  { bar.style.transition = 'none'; }
+
+    prevBtn.addEventListener('click', () => { goTo(current - 1); startAuto(); });
+    nextBtn.addEventListener('click', () => { goTo(current + 1); startAuto(); });
+
+    /* ── YouTube postMessage listener (pause auto-slide while watching) ── */
+    if (isYoutube) {
+      window.addEventListener('message', (e) => {
+        try {
+          const data = JSON.parse(e.data);
+          /* YT player state: 1 = playing, 2 = paused, 0 = ended */
+          if (data.event === 'onStateChange') {
+            if (data.info === 1) {
+              isPausedByYT = true;
+              pauseBar();
+            } else if (data.info === 2 || data.info === 0) {
+              isPausedByYT = false;
+              startAuto();
+            }
+          }
+        } catch (_) {}
+      });
+    }
+
+    /* kick off */
+    updateDots();
+    startAuto();
+  }
+
+  /* ── YouTube iFrame API (required for state detection) ──────────── */
+  /* This script tag enables the YT postMessage events above */
+  const ytScript = document.createElement('script');
+  ytScript.src = 'https://www.youtube.com/iframe_api';
+  document.head.appendChild(ytScript);
+
+  /* ── Initialize both carousels ────────────────────────────────── */
+
+  /* GAMING carousel (YouTube videos — auto-pause when watching) */
+  initCarousel({
+    slidesId:  'gaming-slides',
+    prevId:    'gaming-prev',
+    nextId:    'gaming-next',
+    dotsId:    'gaming-dots',
+    barId:     'gaming-bar',
+    isYoutube: true    /* ← set false if you remove YouTube embeds */
+  });
+
+  /* POSTER carousel (Drive images/PDFs — no YouTube, no pause) */
+  initCarousel({
+    slidesId:  'poster-slides',
+    prevId:    'poster-prev',
+    nextId:    'poster-next',
+    dotsId:    'poster-dots',
+    barId:     'poster-bar',
+    isYoutube: false
+  });
+
+  /* ══════════════════════════════════════════════════════════════════
+     LANGUAGE SWITCHER — also controls currency display
+     EN → USD prices highlighted, IDR shown as secondary
+     ID → IDR prices highlighted, USD shown as secondary
+     To add new translatable text: add data-en="..." data-id="..." to any element.
+  ══════════════════════════════════════════════════════════════════ */
+  let currentLang = 'en';
+
+  function applyLang(lang) {
+    currentLang = lang;
+    document.documentElement.lang = lang === 'id' ? 'id' : 'en';
+
+    document.querySelectorAll('[data-en]').forEach(el => {
+      const text = el.getAttribute('data-' + lang);
+      if (text !== null) el.innerHTML = text;
+    });
+
+    /* currency emphasis: EN = USD primary, ID = IDR primary */
+    const usdPrimary = lang === 'en';
+    document.querySelectorAll('.price-usd').forEach(el => {
+      el.style.fontSize = usdPrimary ? '' : 'clamp(0.75rem,1.8vw,1rem)';
+      el.style.color    = usdPrimary ? '#fff' : 'var(--text-muted)';
+    });
+    document.querySelectorAll('.price-idr').forEach(el => {
+      el.style.fontSize   = usdPrimary ? '' : 'clamp(0.9rem,2.5vw,1.3rem)';
+      el.style.color      = usdPrimary ? '' : '#fff';
+      el.style.fontFamily = usdPrimary ? '' : 'var(--font-pixel)';
+    });
+
+    document.querySelectorAll('#langToggle button').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.lang === lang);
+    });
+  }
+
+  document.querySelectorAll('#langToggle button').forEach(btn => {
+    btn.addEventListener('click', () => applyLang(btn.dataset.lang));
+  });
+
+  /* init */
+  applyLang('en');
+
+  /* ══════════════════════════════════════════════════════════════════
+     RUBY SPARK PARTICLES — premium card canvas animation
+     Edit these values to tweak the effect:
+       SPARK_COUNT      — how many particles at once
+       SPARK_SPEED      — base speed multiplier
+       SPARK_SIZE_MAX   — max radius of a spark
+       SPARK_LIFETIME   — frames a spark lives before fading out
+  ══════════════════════════════════════════════════════════════════ */
+  (function initRubySparks() {
+    const card   = document.getElementById('premiumCard');
+    const canvas = document.getElementById('rubyCanvas');
+    if (!canvas || !card) return;
+
+    const ctx = canvas.getContext('2d');
+
+    const SPARK_COUNT    = 35;   /* ← EDIT: number of particles */
+    const SPARK_SPEED    = 0.18; /* ← EDIT: speed (higher = faster) */
+    const SPARK_SIZE_MAX = 2.0;  /* ← EDIT: max dot radius in px */
+    const SPARK_LIFETIME = 220;  /* ← EDIT: frames before respawn */
+
+    /* ruby color palette — smooth red, white, soft pink */
+    const COLORS = [
+      'rgba(220, 20,  50,  ',   /* ruby red */
+      'rgba(255, 60,  80,  ',   /* bright ruby */
+      'rgba(255,160,170,  ',    /* light pink */
+      'rgba(255,220,225,  ',    /* near white pink */
+      'rgba(255,255,255,  ',    /* pure white spark */
+      'rgba(190,  0,  30,  ',   /* deep ruby */
+    ];
+
+    let W, H, sparks = [];
+
+    function resize() {
+      W = canvas.width  = card.offsetWidth;
+      H = canvas.height = card.offsetHeight;
+    }
+
+    function randomSpark() {
+      const drift = (Math.random() - 0.5) * 0.3;
+      return {
+        x:    Math.random() * W,
+        y:    H + 6,
+        vx:   drift,
+        vy:   -(0.3 + Math.random() * 0.5) * SPARK_SPEED,
+        ax:   (Math.random() - 0.5) * 0.004,
+        r:    0.3 + Math.random() * SPARK_SIZE_MAX,
+        life: 0,
+        maxLife: SPARK_LIFETIME + Math.floor(Math.random() * 60),
+        color: COLORS[Math.floor(Math.random() * COLORS.length)],
+        twinkle: Math.random() * Math.PI * 2,
+      };
+    }
+
+    /* pre-spread sparks across full lifetime so it doesn't look empty on load */
+    function initSparks() {
+      sparks = [];
+      for (let i = 0; i < SPARK_COUNT; i++) {
+        const s = randomSpark();
+        s.life    = Math.floor(Math.random() * SPARK_LIFETIME);
+        s.y       = H - (s.life / s.maxLife) * H * 1.1;
+        sparks.push(s);
+      }
+    }
+
+    function tick() {
+      ctx.clearRect(0, 0, W, H);
+
+      for (let i = 0; i < sparks.length; i++) {
+        const s = sparks[i];
+        s.x += s.vx;
+        s.vx += s.ax;  /* gentle horizontal drift */
+        s.y += s.vy;
+        s.life++;
+        s.twinkle += 0.04;
+
+        const progress = s.life / s.maxLife;
+        /* fade in 0→0.2, full 0.2→0.7, fade out 0.7→1 */
+        let alpha;
+        if (progress < 0.2)      alpha = progress / 0.2;
+        else if (progress < 0.7) alpha = 1;
+        else                     alpha = 1 - (progress - 0.7) / 0.3;
+
+        /* slight twinkle */
+        alpha *= 0.6 + 0.4 * Math.sin(s.twinkle);
+
+        if (s.life >= s.maxLife || s.y < -10) {
+          sparks[i] = randomSpark();
+          continue;
+        }
+
+        /* draw glow halo */
+        const grd = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, s.r * 4);
+        grd.addColorStop(0,   s.color + (alpha * 0.9).toFixed(2) + ')');
+        grd.addColorStop(0.4, s.color + (alpha * 0.4).toFixed(2) + ')');
+        grd.addColorStop(1,   s.color + '0)');
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.r * 4, 0, Math.PI * 2);
+        ctx.fillStyle = grd;
+        ctx.fill();
+
+        /* draw core dot */
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        ctx.fillStyle = s.color + Math.min(alpha * 1.2, 1).toFixed(2) + ')';
+        ctx.fill();
+      }
+
+      requestAnimationFrame(tick);
+    }
+
+    /* pause sparks when card is off-screen (performance) */
+    let visible = false;
+    const observer = new IntersectionObserver(entries => {
+      visible = entries[0].isIntersecting;
+    }, { threshold: 0.1 });
+    observer.observe(card);
+
+    let running = false;
+    function loop() {
+      if (!running) return;
+      tick();
+    }
+
+    /* use a single rAF loop gated by visibility */
+    function rafLoop() {
+      if (visible) tick();
+      requestAnimationFrame(rafLoop);
+    }
+
+    resize();
+    initSparks();
+    rafLoop();
+
+    window.addEventListener('resize', () => { resize(); initSparks(); });
+  })();
+</script>
+</body>
+</html>
