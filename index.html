@@ -468,17 +468,75 @@
     .embed-yt {
       position: relative;
       width: 100%;
-      padding-top: 56.25%;
+      padding-top: 56.25%; /* 16:9 */
       border-radius: 8px;
       overflow: hidden;
       background: #000;
       border: 1px solid rgba(0,245,255,0.1);
     }
-    .embed-yt iframe {
+    .embed-yt iframe,
+    .embed-yt .yt-facade {
       position: absolute;
       inset: 0;
       width: 100%; height: 100%;
       border: none;
+    }
+
+    /* ── YouTube Facade (thumbnail + play button, loads iframe on click) ── */
+    .yt-facade {
+      cursor: pointer;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .yt-facade img {
+      position: absolute;
+      inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      transition: transform 0.4s ease, filter 0.3s;
+      filter: brightness(0.75);
+    }
+    .yt-facade:hover img {
+      transform: scale(1.03);
+      filter: brightness(0.6);
+    }
+    .yt-play-btn {
+      position: relative;
+      z-index: 2;
+      width: 68px; height: 48px;
+      background: #ff0000;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 0 0 rgba(255,0,0,0.5);
+      transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+    }
+    .yt-facade:hover .yt-play-btn {
+      transform: scale(1.12);
+      background: #cc0000;
+      box-shadow: 0 0 24px rgba(255,0,0,0.6);
+    }
+    .yt-play-btn::after {
+      content: '';
+      border-style: solid;
+      border-width: 10px 0 10px 20px;
+      border-color: transparent transparent transparent #fff;
+      margin-left: 4px;
+    }
+    /* "Click to load" label */
+    .yt-label {
+      position: absolute;
+      bottom: 12px; left: 50%;
+      transform: translateX(-50%);
+      font-family: var(--font-pixel);
+      font-size: 0.35rem;
+      color: rgba(255,255,255,0.6);
+      letter-spacing: 2px;
+      white-space: nowrap;
+      z-index: 2;
     }
 
     .embed-drive {
@@ -1037,16 +1095,15 @@
         ════════════════════════════════════════════════════ -->
         <div class="slide active">
           <div class="embed-yt">
-            <!-- ▼ EDIT: Ganti src= di bawah dengan src dari embed YouTube kamu -->
-            <!-- Cara: YouTube → Share → Embed → copy bagian src="..." nya saja -->
-            <iframe
-              src="https://www.youtube.com/embed/0Op_PNSJp5U?si=hkAO37KHiOmetjvj&amp;controls=1"
-              title="Gaming Edit 1"
-              frameborder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              referrerpolicy="strict-origin-when-cross-origin"
-              allowfullscreen>
-            </iframe>
+            <!-- ▼ EDIT: Ganti VIDEO_ID_HERE dengan ID video YouTube kamu -->
+            <div class="yt-facade" data-ytid="VIDEO_ID_HERE">
+              <img
+                src="https://i.ytimg.com/vi/0Op_PNSJp5U/maxresdefault.jpg"
+                onerror="this.src='https://i.ytimg.com/vi/0Op_PNSJp5U/hqdefault.jpg'"
+                alt="Gaming Edit 1" />
+              <div class="yt-play-btn"></div>
+              <div class="yt-label">▶ CLICK TO WATCH</div>
+            </div>
           </div>
           <div class="slide-meta">
             <!-- ▼ EDIT: Title of the video project -->
@@ -1067,15 +1124,15 @@
         ════════════════════════════════════════════════════ -->
         <div class="slide">
           <div class="embed-yt">
-            <!-- ▼ EDIT: Ganti src= dengan src dari embed YouTube kamu -->
-            <iframe
-              src="https://www.youtube.com/embed/VIDEO_ID_HERE?si=PASTE_SI_HERE"
-              title="Gaming Edit 2"
-              frameborder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              referrerpolicy="strict-origin-when-cross-origin"
-              allowfullscreen>
-            </iframe>
+            <!-- ▼ EDIT: Ganti VIDEO_ID_HERE -->
+            <div class="yt-facade" data-ytid="VIDEO_ID_HERE">
+              <img
+                src="https://i.ytimg.com/vi/VIDEO_ID_HERE/maxresdefault.jpg"
+                onerror="this.src='https://i.ytimg.com/vi/VIDEO_ID_HERE/hqdefault.jpg'"
+                alt="Gaming Edit 2" />
+              <div class="yt-play-btn"></div>
+              <div class="yt-label">▶ CLICK TO WATCH</div>
+            </div>
           </div>
           <div class="slide-meta">
             <div class="slide-title">PROJECT TITLE HERE</div>
@@ -1092,15 +1149,15 @@
         ════════════════════════════════════════════════════ -->
         <div class="slide">
           <div class="embed-yt">
-            <!-- ▼ EDIT: Ganti src= dengan src dari embed YouTube kamu -->
-            <iframe
-              src="https://www.youtube.com/embed/VIDEO_ID_HERE?si=PASTE_SI_HERE"
-              title="Gaming Edit 3"
-              frameborder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              referrerpolicy="strict-origin-when-cross-origin"
-              allowfullscreen>
-            </iframe>
+            <!-- ▼ EDIT: Ganti VIDEO_ID_HERE -->
+            <div class="yt-facade" data-ytid="VIDEO_ID_HERE">
+              <img
+                src="https://i.ytimg.com/vi/VIDEO_ID_HERE/maxresdefault.jpg"
+                onerror="this.src='https://i.ytimg.com/vi/VIDEO_ID_HERE/hqdefault.jpg'"
+                alt="Gaming Edit 3" />
+              <div class="yt-play-btn"></div>
+              <div class="yt-label">▶ CLICK TO WATCH</div>
+            </div>
           </div>
           <div class="slide-meta">
             <div class="slide-title">PROJECT TITLE HERE</div>
@@ -1417,7 +1474,7 @@
 
       <div class="contact-links">
         <!-- ▼ EDIT: Replace href with your actual contact links -->
-        <a class="btn btn-primary" href="/cdn-cgi/l/email-protection#245d4b51564149454d48644349454d480a474b49">EMAIL ME</a>
+        <a class="btn btn-primary" href="mailto:youremail@gmail.com">EMAIL ME</a>
         <a class="btn btn-outline" href="https://instagram.com/yourhandle" target="_blank" rel="noopener">INSTAGRAM</a>
         <!-- Add more contact buttons here, same format as above -->
       </div>
@@ -1578,6 +1635,30 @@
     dotsId:    'poster-dots',
     barId:     'poster-bar',
     isYoutube: false
+  });
+
+  /* ══════════════════════════════════════════════════════════════════
+     YOUTUBE FACADE — click thumbnail to load real player
+     Thumbnail tampil dulu (ringan, no error), player load saat diklik.
+     Auto-slide berhenti saat video sedang diputar.
+  ══════════════════════════════════════════════════════════════════ */
+  document.querySelectorAll('.yt-facade').forEach(facade => {
+    facade.addEventListener('click', function () {
+      const ytid = this.dataset.ytid;
+      if (!ytid || ytid === 'VIDEO_ID_HERE') return;
+
+      const wrap = this.parentElement; /* .embed-yt */
+      const iframe = document.createElement('iframe');
+      iframe.src = `https://www.youtube.com/embed/${ytid}?autoplay=1&enablejsapi=1&rel=0`;
+      iframe.title = 'YouTube video player';
+      iframe.frameBorder = '0';
+      iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+      iframe.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
+      iframe.allowFullscreen = true;
+      iframe.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;border:none;';
+
+      this.replaceWith(iframe); /* swap facade → real player */
+    });
   });
 
   /* ══════════════════════════════════════════════════════════════════
