@@ -1,0 +1,139 @@
+[
+  {
+    "mode": "desktop",
+    "states": [
+      {
+        "id": "tentang",
+        "overflow": false,
+        "progress": "0.5072"
+      },
+      {
+        "id": "observasi",
+        "overflow": false,
+        "progress": "0.0000"
+      },
+      {
+        "id": "karya",
+        "overflow": false,
+        "progress": "0.2179"
+      },
+      {
+        "id": "pengalaman",
+        "overflow": false,
+        "progress": "0.4251"
+      },
+      {
+        "id": "kontak",
+        "overflow": false,
+        "progress": "0.4849"
+      }
+    ],
+    "errors": [],
+    "controls": "passed"
+  },
+  {
+    "mode": "mobile",
+    "states": [
+      {
+        "id": "tentang",
+        "overflow": false,
+        "progress": "0.4486"
+      },
+      {
+        "id": "observasi",
+        "overflow": false,
+        "progress": "0.0000"
+      },
+      {
+        "id": "karya",
+        "overflow": false,
+        "progress": "0.1987"
+      },
+      {
+        "id": "pengalaman",
+        "overflow": false,
+        "progress": "0.3762"
+      },
+      {
+        "id": "kontak",
+        "overflow": false,
+        "progress": "0.4784"
+      }
+    ],
+    "errors": [],
+    "controls": "passed"
+  },
+  {
+    "mode": "small",
+    "states": [
+      {
+        "id": "tentang",
+        "overflow": false,
+        "progress": "0.3724"
+      },
+      {
+        "id": "observasi",
+        "overflow": false,
+        "progress": "0.0000"
+      },
+      {
+        "id": "karya",
+        "overflow": false,
+        "progress": "0.1589"
+      },
+      {
+        "id": "pengalaman",
+        "overflow": false,
+        "progress": "0.3006"
+      },
+      {
+        "id": "kontak",
+        "overflow": false,
+        "progress": "0.4114"
+      }
+    ],
+    "errors": [],
+    "controls": "passed"
+  },
+  {
+    "mode": "reduced",
+    "states": [
+      {
+        "id": "tentang",
+        "overflow": false,
+        "progress": "0.5072"
+      },
+      {
+        "id": "observasi",
+        "overflow": false,
+        "progress": "0.0000"
+      },
+      {
+        "id": "karya",
+        "overflow": false,
+        "progress": "0.2179"
+      },
+      {
+        "id": "pengalaman",
+        "overflow": false,
+        "progress": "0.4251"
+      },
+      {
+        "id": "kontak",
+        "overflow": false,
+        "progress": "0.4849"
+      }
+    ],
+    "errors": [],
+    "controls": "passed"
+  },
+  {
+    "mode": "file://",
+    "controls": "passed",
+    "broken": []
+  },
+  {
+    "mode": "no JavaScript",
+    "content": "passed"
+  }
+]
