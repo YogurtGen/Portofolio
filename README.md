@@ -10,7 +10,7 @@ Tema visualnya terinspirasi Patrick Jane dalam *The Mentalist*: teh, catatan obs
 Tautan website akan terisi otomatis di sini setelah publikasi pertama berhasil melalui GitHub Pages.
 <!-- PORTFOLIO_WEB_END -->
 
-[Halaman HTML](./index.html) · [Sumber di Notion](https://app.notion.com/p/29cb940dc0d080d8b21fc9db13bab1d8)
+[Halaman HTML] (https://yogurtgen.github.io/Portofolio/) · [Sumber di Notion](https://app.notion.com/p/29cb940dc0d080d8b21fc9db13bab1d8)
 
 Untuk melihat website di komputer, unduh repository lalu buka `index.html` di browser.
 
