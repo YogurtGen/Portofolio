@@ -1,4 +1,4 @@
-# Althaf Ivander Luthf — Portfolio
+# This just random AI shit — Portfolio
 
 Portofolio mahasiswa psikologi dengan pengalaman desain visual, produksi konten, dokumentasi acara, audio, organisasi, dan riset. Website ini memuat 15 proyek dari Student Portfolio di Notion.
 
